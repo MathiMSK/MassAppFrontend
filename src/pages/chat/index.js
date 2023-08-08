@@ -96,7 +96,7 @@ const Chat = () => {
           id: i._id,
         });
       }
-    });
+    }); 
     setData1(data);
     setID(pro?.data?.data._id);
   };
