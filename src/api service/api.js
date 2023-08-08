@@ -1,4 +1,4 @@
-let baseUrl = "http://192.168.1.31:7373/api/";
+let baseUrl = "http://localhost:7373/api/";
 /***************************************************************************************USER API ********************************************************/
 export const userLogin = async (body) => {
   const requestOptions = {
@@ -125,7 +125,6 @@ export const UserVideos = async() => {
       "Content-Type": "application/json",
       token:gettoken
     },
- 
   };
   const response = await fetch(`${baseUrl}video/getvideo/user`, requestOptions);
   if (!response.ok) {
@@ -460,6 +459,25 @@ export const getchatId = async (id ) => {
   let data = await response?.json();
   return { data: data, ok: true };
 };
+export const deleteMessage = async (id,messageId) => {
+  let token = localStorage.getItem("token");
+  let gettoken=JSON.parse(token)
+  const requestOptions ={
+    method: "DELETE",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      token:gettoken
+    }, 
+  };
+  const response = await fetch(`${baseUrl}message/deletemessage/${id}?messageId=${messageId}`, requestOptions);
+  if (!response.ok) {
+    let data = await response.json();
+    return { data: data, ok: false };
+  }
+  let data = await response?.json();
+  return { data: data, ok: true };
+};
 /*************************************************************************************** Group  CHAT API ********************************************************/
 
 export const groupchatCreate = async (body) => {
@@ -482,6 +500,7 @@ export const groupchatCreate = async (body) => {
   let data = await response?.json();
   return { data: data, ok: true };
 };
+
 export const getgroupchatId = async (id) => {
   let token = localStorage.getItem("token");
   let gettoken=JSON.parse(token)
@@ -501,3 +520,44 @@ export const getgroupchatId = async (id) => {
   let data = await response?.json();
   return { data: data, ok: true };
 };
+export const removeGroupUser = async (id,body) => {
+  let token = localStorage.getItem("token");
+  let gettoken=JSON.parse(token)
+  const requestOptions ={
+    method: "PUT",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      token:gettoken
+    }, 
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(`${baseUrl}chat/removeuser/${id}`, requestOptions);
+  if (!response.ok) {
+    let data = await response.json();
+    return { data: data, ok: false };
+  }
+  let data = await response?.json();
+  return { data: data, ok: true };
+}
+
+export const addGroupUser = async (id,body) => {
+  let token = localStorage.getItem("token");
+  let gettoken=JSON.parse(token)
+  const requestOptions ={
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      token:gettoken
+    }, 
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(`${baseUrl}chat/adduser/${id}`, requestOptions);
+  if (!response.ok) {
+    let data = await response.json();
+    return { data: data, ok: false };
+  }
+  let data = await response?.json();
+  return { data: data, ok: true };
+}
