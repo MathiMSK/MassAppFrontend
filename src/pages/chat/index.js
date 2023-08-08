@@ -14,6 +14,8 @@ import Header from "../../header";
 import { toast } from "react-toastify";
 import { MDBRow, MDBCol } from "mdb-react-ui-kit";
 import "./chat.css";
+import { Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import io from "socket.io-client";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -27,6 +29,7 @@ import {
   UserChat,
   WriteChat,
   allUser,
+  deleteMessage,
   getByIdChat,
   getchatId,
   profile,
@@ -37,6 +40,8 @@ import { Box, Typography } from "@mui/material";
 import ScrollableFeed from "react-scrollable-feed";
 import _ from "lodash";
 import GroupChat from "./chat";
+import IconButton1 from "@mui/material/IconButton";
+import moment from "moment/moment";
 import jwt_decode from "jwt-decode";
 
 let token = localStorage.getItem("token");
@@ -49,9 +54,9 @@ const ENDPOINT = "http://localhost:7373/";
 var socket, selectedChatCompare;
 
 const Chat = () => {
-  // let token = localStorage.getItem("token");
-  // let decoded = jwt_decode(token);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [data1, setData1] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [basicModal, setBasicModal] = useState(false);
   const [removeuser, setRemoveuser] = useState();
   const [action, setAction] = useState("");
@@ -63,14 +68,15 @@ const Chat = () => {
   const [send, setSend] = useState([]);
   const [demo, setDemo] = useState([]);
   const [searchinput, setSearchinput] = useState();
+  const [deleteId, setDeleteId] = useState("");
   const [reload, setReload] = useState(false);
+  const [group, setGroup] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
   const user = async () => {
     let data = [];
     let res = await allUser();
-    console.log(res);
+    setAllData(res?.data?.users);
     let pro = await profile();
-    console.log(pro);
     let reschat = await userGetChat();
     let sort = _.sortBy(reschat.data, (i) => {
       return new Date(i?.updatedAt);
@@ -96,7 +102,7 @@ const Chat = () => {
           id: i._id,
         });
       }
-    }); 
+    });
     setData1(data);
     setID(pro?.data?.data._id);
   };
@@ -112,7 +118,9 @@ const Chat = () => {
     setSend(i?.messages);
     setchatId(i?._id);
   };
-
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", decoded);
@@ -158,12 +166,26 @@ const Chat = () => {
     setReload(!reload);
   };
   const messagehandel = async () => {
-    await WriteChat(chatId, { message: sendMessage });
-    const data = await getByIdChat(chatId);
-    socket.emit("new message",data);
-    setSendMessage("");
-    setReload(!reload);
+    if(sendMessage!=="") {
+      await WriteChat(chatId, { message: sendMessage });
+      const data = await getByIdChat(chatId);
+      socket.emit("new message",data);
+      setSendMessage("");
+      setReload(!reload);
+    }
   };
+
+  const open = Boolean(anchorEl);
+  const handleClick = (event,item) => {
+    setDeleteId(item)
+    setAnchorEl(event.currentTarget);
+  };
+
+const deletemessage=async()=>{ 
+    await deleteMessage(chatId,deleteId._id)
+    setAnchorEl(null)
+    setReload(!reload)
+}
 
   useEffect(() => {
     
@@ -171,7 +193,7 @@ const Chat = () => {
       try {
         let res = await getByIdChat(chatId);
           setSend(res.data.messages);
-        
+          setGroup(res.data.isGroup)
           socket.emit("join chat", chatId);
           
         } catch (error) {
@@ -210,6 +232,7 @@ const Chat = () => {
                 {basicModal && (
                   <GroupChat
                     data={data1}
+                    allData={allData}
                     setBasicModal={setBasicModal}
                     basicModal={basicModal}
                     setReload={setReload}
@@ -252,7 +275,7 @@ const Chat = () => {
                 >
                   {demo?.map((i, index) =>
                     !i.isGroup ? (
-                      i?.users.map((j, index) => {
+                      i?.users?.map((j, index) => {
                         if (j._id !== id) {
                           return (
                             <ul key={index}>
@@ -307,21 +330,23 @@ const Chat = () => {
                   <Typography
                     style={{ fontFamily: "serif", fontSize: "larger" }}
                   >
-                    {chatData.toUpperCase()}
+                    {chatData.toUpperCase()} 
                   </Typography>{" "}
                   <Avatar
                     src={chatpic}
                     style={{ cursor: "pointer" }}
                     onClick={() => {
-                      setAction("view");
-                      setBasicModal(!basicModal);
+                      if(group===true){
+                        setAction("view");
+                        setBasicModal(!basicModal);
+                      }
                     }}
                   />{" "}
                 </MDBCardHeader>
                 <MDBCardBody
                   style={{
                     background:
-                      'url("https://wallpapercave.com/wp/wp5593679.jpg") no-repeat',
+                      'url("https://i.ytimg.com/vi/QNAYhssraok/maxresdefault.jpg") no-repeat',
                     backgroundSize: "cover",
                     overflow: "hidden",
                     display: "flex",
@@ -392,6 +417,8 @@ const Chat = () => {
                                 marginRight: "10px",
                               }}
                             >
+                              <div style={{display:"flex",alignItems:"center"}}>
+
                               <Typography
                                 style={{
                                   fontFamily: "serif",
@@ -402,6 +429,31 @@ const Chat = () => {
                               >
                                 {i?.message}
                               </Typography>
+                              <IconButton1
+                                aria-label="settings"
+                                id="basic-button"
+                                aria-controls={open ? "basic-menu" : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={open ? "true" : undefined}
+                                onClick={(e)=>handleClick(e,i)}
+                              >
+                                <MoreVertIcon style={{ color: "white" }} />
+                              </IconButton1>
+                              <Menu
+                                id="basic-menu"
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                                MenuListProps={{
+                                  "aria-labelledby": "basic-button",
+                                }}
+                              > 
+                                <MenuItem onClick={()=>deletemessage()}>Delete</MenuItem>
+                              </Menu>
+                              </div>
+                              <div style={{fontSize: "11px",color:"#c9c0c0"}}>
+                                {moment(i.createdAt).format('LT')}
+                              </div>
                             </div>
                           </Box>
                         )}
@@ -413,14 +465,22 @@ const Chat = () => {
                   className="text-muted"
                   style={{ display: "flex", alignItems: "center" }}
                 >
-                  <MDBInput
-                    id="formControlLg"
-                    type="text"
-                    size="lg"
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      messagehandel();
+                    }}
                     style={{ width: "100%" }}
-                    value={sendMessage}
-                    onChange={(e) => setSendMessage(e.target.value)}
-                  />{" "}
+                  >
+                    <MDBInput
+                      id="formControlLg"
+                      type="text"
+                      size="lg"
+                      style={{ width: "100%" }}
+                      value={sendMessage}
+                      onChange={(e) => setSendMessage(e.target.value)}
+                    />{" "}
+                  </form>
                   <RiSendPlaneFill
                     style={{ width: "34px", height: "34px", cursor: "pointer" }}
                     onClick={() => messagehandel()}
