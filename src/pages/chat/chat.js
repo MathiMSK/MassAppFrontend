@@ -93,6 +93,7 @@ export default function GroupChat({
         filterdata.push(item);
       }
     });
+    console.log(filterdata);
     setAdd(filterdata);
     setCheckData(arr);
     setRemoveId(filterdata);
