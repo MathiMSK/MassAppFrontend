@@ -21,11 +21,15 @@ import {
   Box,
   Button,
   Card,
+  Checkbox,
   Divider,
+  FormControlLabel,
   TextField,
   Typography,
 } from "@mui/material";
 import {
+  Addadmin,
+  Removeadmin,
   addGroupUser,
   getgroupchatId,
   groupchatCreate,
@@ -33,6 +37,7 @@ import {
 } from "../../api service/api";
 
 import { toast } from "react-toastify";
+import { Close, Verified } from "@mui/icons-material";
 
 const animatedComponents = makeAnimated();
 export default function GroupChat({
@@ -44,16 +49,14 @@ export default function GroupChat({
   setReload,
   action,
   chatId,
-  id,
-  setGroup,
-  group
+  id
 }) {
   const [selectuser, setselectuser] = useState([]);
   const [add, setAdd] = useState([]);
   const [checkData, setCheckData] = useState([]);
   const [removeId, setRemoveId] = useState([]);
   const [users, setUsers] = useState([]);
-  const [reloadData, setReloadData] = useState(false);
+  const [admin, setAdmin] = useState([]);
   const [editUsers, setEditUsers] = useState([]);
   const [groupName, setGroupName] = useState("");
 
@@ -80,12 +83,13 @@ export default function GroupChat({
     let arr = [];
     let filterdata = [];
     let res = await getgroupchatId(chatId);
-    console.log(res);
     res?.data?.map((i) => {
+      setAdmin(i?.groupAdmin)
       i?.users?.map((j) => {
         if (j?._id !== id) return arr.push(j);
       });
     });
+    console.log(admin);
     setEditUsers(arr);
     allData?.map((item) => {
       let found = arr.some((j) => item._id == j._id);
@@ -93,7 +97,6 @@ export default function GroupChat({
         filterdata.push(item);
       }
     });
-    console.log(filterdata);
     setAdd(filterdata);
     setCheckData(arr);
     setRemoveId(filterdata);
@@ -101,8 +104,8 @@ export default function GroupChat({
   };
 
   const remove = async () => {
+  
     let userId = [];
-    console.log(removeId);
     add.map((item) => {
       let found = removeId.some((j) => item._id == j._id);
       if (!found && item._id !== id) {
@@ -113,11 +116,10 @@ export default function GroupChat({
       let res = await removeGroupUser(chatId, {
         userId: userId,
       });
-      if (res.ok) {
+      if (res?.ok) {
         toast.success(res.data.message);
-        // setReload(!reload)
-        // setReloadData(!reloadData)
       }
+     
     }
   };
 
@@ -129,7 +131,7 @@ export default function GroupChat({
         userId.push(item._id);
       }
     });
-    console.log(userId);
+
     if (userId.length !== 0) {
       let response = await addGroupUser(chatId, {
         userId: userId,
@@ -157,13 +159,31 @@ export default function GroupChat({
     let a = [...add, i];
     editUsers.splice(index, 1);
     setAdd(a);
-  };
-
+  }; 
   useEffect(() => {
     getChat();
     adduser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectuser, reloadData]);
+  }, [selectuser]);
+
+  const removeAdmin=async(i)=>{ 
+      let ad=admin.filter((item)=>item._id!=i._id)
+      try {
+        await Removeadmin(chatId,{userId:i._id})
+      } catch (error) {
+        console.log(error);
+      }
+      setAdmin(ad)  
+  }
+
+  const addAdmin=async(i)=>{
+    let ad=[]
+    admin.map((item)=>ad.push(item))
+    ad.push(i)
+    let res = await Addadmin(chatId,{userId:i._id}) 
+    setAdmin(ad)
+  }
+  
 
   return (
     <div style={{ width: "100%" }}>
@@ -203,8 +223,7 @@ export default function GroupChat({
               ) : (
                 <>
                   <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
+                    style={{ display: "flex", justifyContent: "space-between" }}>
                     <MDBModalTitle>ADD User</MDBModalTitle>
                     <Button variant="contained" onClick={adduserdata}>
                       <GrAddCircle />
@@ -217,11 +236,13 @@ export default function GroupChat({
                       width: "125px",
                       marginBottom: "10px",
                     }}
-                  />
-                  <MDBRow>
-                    {editUsers?.map((i, index) => (
+                  /> 
+                  <div style={{display:"flex",flexWrap:"wrap"}} >
+                    {editUsers?.map((i, index) => {
+                      
+                      return (
                       <Fragment key={index}>
-                        <MDBCol size="md">
+                        <div  style={{width:"fit-content",margin:"0 10px"}}> 
                           <Box>
                             <div
                               style={{
@@ -232,11 +253,13 @@ export default function GroupChat({
                                 padding: "10px",
                                 wordBreak: "break-word",
                                 marginBottom: "1px",
-                                borderRadius: "40px",
+                                borderRadius: "20px",
                                 cursor: "pointer",
                               }}
-                              onClick={() => removedemohandel(i, index)}
+                              
                             >
+                         {/*{ admin.map((j)=>i._id===j._id ? (<center style={{color:"green"}}>admin</center>):null)} */}
+                        
                               <div
                                 style={{
                                   display: "flex",
@@ -244,16 +267,25 @@ export default function GroupChat({
                                 }}
                               >
                                 <Avatar src={i?.profilePicture} />
-                                <Typography>{i?.username}</Typography>
-                                <CiCircleRemove />
+                                <Typography sx={{margin :"5px"}} >{i?.username}</Typography>
+                                <div style={{display:"flex",flexDirection:"column",alignItems:"center",margin:"0 5px"}}>
+                                  <p style={{margin:0,fontSize:"12px"}}>Admin</p>
+                                  <div >
+                                    {admin.some((j)=>j._id == i._id ) ?
+                                      <Verified sx={{width:"20px",height:"20px",color:"green"}} onClick={()=>removeAdmin(i)} />:
+                                      <Verified sx={{width:"20px",height:"20px",color:"white"}} onClick={()=>addAdmin(i)} /> 
+                                    }
+                                  </div>
+                                </div>
+                                <Close onClick={() => removedemohandel(i, index)} />
                               </div>
                             </div>
                           </Box>
                           <br />
-                        </MDBCol>
+                        </div>
                       </Fragment>
-                    ))}
-                  </MDBRow>
+                    )})} 
+                    </div>
                   <Card variant="outlined">
                     <Divider />
                     <div
@@ -262,7 +294,7 @@ export default function GroupChat({
                         justifyContent: "space-between",
                       }}
                     >
-                      <MDBModalTitle>Remove User</MDBModalTitle>
+                      <MDBModalTitle>All User</MDBModalTitle>
                       <Button variant="contained" onClick={remove}>
                         <CiCircleRemove />
                       </Button>
@@ -275,10 +307,10 @@ export default function GroupChat({
                         marginBottom: "10px",
                       }}
                     />
-                    <MDBRow>
+                    <div style={{display:"flex",flexWrap:"wrap"}}>
                       {add?.map((i, index) => (
                         <Fragment key={index}>
-                          <MDBCol size="md">
+                          <div  style={{width:"fit-content",margin:"0 10px"}}>
                             <Box>
                               <div
                                 style={{
@@ -289,7 +321,7 @@ export default function GroupChat({
                                   padding: "10px",
                                   wordBreak: "break-word",
                                   marginBottom: "1px",
-                                  borderRadius: "40px",
+                                  borderRadius: "20px",
                                   cursor: "pointer",
                                 }}
                                 onClick={() => demohandel(i, index)}
@@ -301,15 +333,15 @@ export default function GroupChat({
                                   }}
                                 >
                                   <Avatar src={i?.profilePicture} />
-                                  <Typography>{i?.username}</Typography>
+                                  <Typography sx={{margin :"5px"}}>{i?.username}</Typography>
                                   <GrAddCircle />
                                 </div>
                               </div>
                             </Box>
-                          </MDBCol>
+                          </div>
                         </Fragment>
                       ))}
-                    </MDBRow>
+                    </div>
                     <br />
                   </Card>
                 </>

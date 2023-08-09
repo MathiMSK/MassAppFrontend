@@ -212,12 +212,11 @@ export default function RecipeReviewCard() {
                       </div>
                       <ReactPlayer
                         url={i.videoUrl}
-                        loop 
-                        autoplay
-                        // playIcon={<button>Play</button>}
-                        // light="https://i.stack.imgur.com/zw9Iz.png"
+                        loop={true}
+                        playing={true}
+                        muted={true}
                         style={{ width: "90%", height: "350px" }}
-                        // controls={true}
+                        controls={true}
                       />
                     </div>
                   </CardMedia>

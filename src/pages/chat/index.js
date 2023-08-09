@@ -131,7 +131,7 @@ const Chat = () => {
     setSearchinput(e.value);
     let found = false;
     let cid = "";
-    demo?.map((item) => {
+    demo.map((item) => {
       item?.users?.find(async (i) => {
         if (i?._id === e.id) {
           cid = item?._id;
@@ -141,8 +141,9 @@ const Chat = () => {
     });
     if (found === false) {
       let res = await UserChat({ newUsers: e.id });
+      console.log(res);
       let response = await getchatId(res?.data?.data?._id);
-      console.log(res?.data?.data);
+      // console.log(res);
       setchatId(res?.data?.data?._id);
       response?.data?.map((i) => {
         i.users.map((j) => {
@@ -165,6 +166,7 @@ const Chat = () => {
     }
     setReload(!reload);
   };
+
   const messagehandel = async () => {
     if(sendMessage!=="") {
       await WriteChat(chatId, { message: sendMessage });
@@ -187,13 +189,12 @@ const deletemessage=async()=>{
     setReload(!reload)
 }
 
-  useEffect(() => {
-    
+  useEffect(() => { 
     let fetch = async () => {
       try {
         let res = await getByIdChat(chatId);
-          setSend(res.data.messages);
-          setGroup(res.data.isGroup)
+          setSend(res?.data?.messages);
+          setGroup(res?.data?.isGroup)
           socket.emit("join chat", chatId);
           
         } catch (error) {
@@ -202,9 +203,7 @@ const deletemessage=async()=>{
       }
       if (chatId) fetch();
       selectedChatCompare = chatId;
-
-
-  }, [chatId, send]);
+  }, [chatId,reload]);
   
   useEffect(() => {
     socket.on("new message", (newMessageRecievd) => {
@@ -216,6 +215,7 @@ const deletemessage=async()=>{
       }
     });
   }, []);
+  
   useEffect(() => {
     user();
   }, [reload]);
@@ -483,7 +483,7 @@ const deletemessage=async()=>{
                   </form>
                   <RiSendPlaneFill
                     style={{ width: "34px", height: "34px", cursor: "pointer" }}
-                    onClick={() => messagehandel()}
+                    onClick={messagehandel}
                   />
                 </MDBCardFooter>
               </MDBCard>
