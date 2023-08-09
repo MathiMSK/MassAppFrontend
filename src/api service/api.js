@@ -348,7 +348,7 @@ export const UserChat = async (body) => {
     },
     body: JSON.stringify(body),
   };
-  const response = await fetch(`${baseUrl}chat/createsinglechat`, requestOptions);
+  const response = await fetch(`${baseUrl}chat/createsinglechat`,requestOptions);
   if (!response.ok) {
     let data = await response.json();
     return { data: data, ok: false };
@@ -554,6 +554,47 @@ export const addGroupUser = async (id,body) => {
     body: JSON.stringify(body),
   };
   const response = await fetch(`${baseUrl}chat/adduser/${id}`, requestOptions);
+  if (!response.ok) {
+    let data = await response.json();
+    return { data: data, ok: false };
+  }
+  let data = await response?.json();
+  return { data: data, ok: true };
+}
+export const Addadmin = async (id,body) => {
+  let token = localStorage.getItem("token");
+  let gettoken=JSON.parse(token)
+  const requestOptions ={
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      token:gettoken
+    }, 
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(`${baseUrl}chat/addadmin/${id}`, requestOptions);
+  if (!response.ok) {
+    let data = await response.json();
+    return { data: data, ok: false };
+  }
+  let data = await response?.json();
+  return { data: data, ok: true };
+}
+
+export const Removeadmin = async (id,body) => {
+  let token = localStorage.getItem("token");
+  let gettoken=JSON.parse(token)
+  const requestOptions ={
+    method: "DELETE",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      token:gettoken
+    }, 
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(`${baseUrl}chat/removeadmin/${id}`, requestOptions);
   if (!response.ok) {
     let data = await response.json();
     return { data: data, ok: false };
