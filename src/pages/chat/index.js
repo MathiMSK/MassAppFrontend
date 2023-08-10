@@ -14,7 +14,7 @@ import Header from "../../header";
 import { toast } from "react-toastify";
 import { MDBRow, MDBCol } from "mdb-react-ui-kit";
 import "./chat.css";
-import { Menu, MenuItem } from "@mui/material";
+import { InputAdornment, Menu, MenuItem, TextField, Tooltip } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import io from "socket.io-client";
 import List from "@mui/material/List";
@@ -23,8 +23,11 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import SearchIcon from "@mui/icons-material/Search";
+import { EmojiStyle } from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react";
 import { useState } from "react";
 import { useEffect } from "react";
+import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import {
   UserChat,
   WriteChat,
@@ -43,6 +46,7 @@ import GroupChat from "./chat";
 import IconButton1 from "@mui/material/IconButton";
 import moment from "moment/moment";
 import jwt_decode from "jwt-decode";
+import { AccountCircle } from "@mui/icons-material";
 
 let token = localStorage.getItem("token");
 let decoded;
@@ -71,7 +75,17 @@ const Chat = () => {
   const [deleteId, setDeleteId] = useState("");
   const [reload, setReload] = useState(false);
   const [group, setGroup] = useState(false);
-  const [socketConnected, setSocketConnected] = useState(false);
+  const [groupCreator, setGroupCreator] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false); 
+  const [groupAdmin, setGroupAdmin] = useState([]); 
+  const [anchorEl1, setAnchorEl1] = useState(null);
+  const open1 = Boolean(anchorEl1);
+  const handleClick1 = (event) => {
+    setAnchorEl1(event.currentTarget);
+  };
+  const handleClose1 = () => {
+    setAnchorEl1(null);
+  };
   const user = async () => {
     let data = [];
     let res = await allUser();
@@ -104,7 +118,7 @@ const Chat = () => {
       }
     });
     setData1(data);
-    setID(pro?.data?.data._id);
+    setID(pro?.data?.data?._id);
   };
   const handle = async (i, j) => {
     setChatData(j?.username);
@@ -113,6 +127,8 @@ const Chat = () => {
     setchatId(i?._id);
   };
   const grouphandle = async (i) => {
+    setGroupAdmin(i?.groupAdmin)
+    setGroupCreator(i?.groupCreator)
     setChatData(i?.groupName);
     setChatpic(i?.groupDp);
     setSend(i?.messages);
@@ -125,7 +141,7 @@ const Chat = () => {
     socket = io(ENDPOINT);
     socket.emit("setup", decoded);
     socket.on("connected", () =>setSocketConnected(true));
-  }, []);
+  },[]);
 
   const chatCreate = async (e) => {
     setSearchinput(e.value);
@@ -141,12 +157,12 @@ const Chat = () => {
     });
     if (found === false) {
       let res = await UserChat({ newUsers: e.id });
-      console.log(res);
       let response = await getchatId(res?.data?.data?._id);
       // console.log(res);
       setchatId(res?.data?.data?._id);
       response?.data?.map((i) => {
         i.users.map((j) => {
+          console.log(j,"vfgdskjgf");
           setChatData(j?.username);
           setChatpic(j?.profilePicture);
           setSend(i?.messages);
@@ -158,6 +174,7 @@ const Chat = () => {
       setchatId(cid);
       response?.data?.map((i) => {
         i.users.map((j) => {
+          console.log(j,"vfgdskjgf");
           setChatData(j?.username);
           setChatpic(j?.profilePicture);
           setSend(i?.messages);
@@ -165,6 +182,18 @@ const Chat = () => {
       });
     }
     setReload(!reload);
+  };
+
+  const onEmojiClick = (e) => {
+    const sym = e.unified.split("_");
+    let codesArray = [];
+    sym.forEach((el) => codesArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codesArray);
+    if (sendMessage) {
+      setSendMessage(sendMessage + emoji);
+    } else {
+      setSendMessage(emoji);
+    }
   };
 
   const messagehandel = async () => {
@@ -191,20 +220,16 @@ const deletemessage=async()=>{
 
   useEffect(() => { 
     let fetch = async () => {
-      try {
-        let res = await getByIdChat(chatId);
-          setSend(res?.data?.messages);
+      let res = await getByIdChat(chatId)
+          socket.emit("join chat",chatId)
+          setSend(res?.data?.messages)
           setGroup(res?.data?.isGroup)
-          socket.emit("join chat", chatId);
-          
-        } catch (error) {
-          console.log(error);
-        }
-      }
+    }
       if (chatId) fetch();
       selectedChatCompare = chatId;
-  }, [chatId,reload]);
+  },[chatId,send,reload])
   
+
   useEffect(() => {
     socket.on("new message", (newMessageRecievd) => {
       if(!selectedChatCompare || selectedChatCompare._id === newMessageRecievd.chat._id){
@@ -214,7 +239,7 @@ const deletemessage=async()=>{
         setSend([...send, newMessageRecievd]);
       }
     });
-  }, []);
+  },[]);
   
   useEffect(() => {
     user();
@@ -281,13 +306,13 @@ const deletemessage=async()=>{
                             <ul key={index}>
                               <ListItem
                                 style={{ cursor: "pointer" }}
-                                onClick={() => handle(i, j)}
+                                onClick={() => handle(i,j)}
                               >
                                 <ListItemAvatar>
                                   <Avatar src={j?.profilePicture} />
                                 </ListItemAvatar>
                                 <ListItemText
-                                  primary={<b>{j.username}</b>}
+                                  primary={<b>{j?.username}</b>}
                                   secondary="Jan 9, 2014"
                                 />
                               </ListItem>
@@ -336,11 +361,13 @@ const deletemessage=async()=>{
                     src={chatpic}
                     style={{ cursor: "pointer" }}
                     onClick={() => {
-                      if(group===true){
-                        setAction("view");
-                        setBasicModal(!basicModal);
-                      }
-                    }}
+                      groupAdmin?.map((i)=>{
+                        if(group===true && (groupCreator===id || i?._id===id)){
+                          setAction("view");
+                          setBasicModal(!basicModal);
+                        }
+                      })
+                      }}
                   />{" "}
                 </MDBCardHeader>
                 <MDBCardBody
@@ -398,6 +425,9 @@ const deletemessage=async()=>{
                                 >
                                   {i?.message}
                                 </Typography>
+                                <div style={{fontSize: "11px",color:"#c9c0c0",display: "flex",justifyContent: "end"}}>
+                                {moment(i.createdAt).format('LT')}
+                              </div>
                               </div>
                             </Box>{" "}
                           </div>
@@ -430,6 +460,7 @@ const deletemessage=async()=>{
                                 {i?.message}
                               </Typography>
                               <IconButton1
+                                style={{width:"8px",display: "flex",justifyContent: "flex-start",top:"-14px"}}
                                 aria-label="settings"
                                 id="basic-button"
                                 aria-controls={open ? "basic-menu" : undefined}
@@ -451,7 +482,7 @@ const deletemessage=async()=>{
                                 <MenuItem onClick={()=>deletemessage()}>Delete</MenuItem>
                               </Menu>
                               </div>
-                              <div style={{fontSize: "11px",color:"#c9c0c0"}}>
+                              <div style={{fontSize: "11px",color:"#c9c0c0",display: "flex",justifyContent: "end"}}>
                                 {moment(i.createdAt).format('LT')}
                               </div>
                             </div>
@@ -472,14 +503,44 @@ const deletemessage=async()=>{
                     }}
                     style={{ width: "100%" }}
                   >
-                    <MDBInput
-                      id="formControlLg"
-                      type="text"
-                      size="lg"
-                      style={{ width: "100%" }}
+                   <TextField
+                    style={{width:"100%"}}
+                      id="outlined-basic"
                       value={sendMessage}
                       onChange={(e) => setSendMessage(e.target.value)}
-                    />{" "}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="start">
+                           <Tooltip title="Account settings">
+                           <SentimentSatisfiedAltIcon style={{cursor:"pointer"}} onClick={handleClick1}  />
+                          </Tooltip>
+                          <Menu
+                            anchorEl={anchorEl1}
+                            id="account-menu"
+                            open={open1}
+                            onClose={handleClose1}
+                            style={{top:"-100px",left:"50px"}}
+                          
+                            transformOrigin={{
+                              horizontal: "right",
+                              vertical: "top",
+                            }}
+                            anchorOrigin={{
+                              horizontal: "right",
+                              vertical: "bottom",
+                            }}
+                          >
+                          <EmojiPicker height={350} width={300} 
+                            onEmojiClick={onEmojiClick}
+                           autoFocusSearch={false}
+                          emojiStyle={EmojiStyle.NATIVE}
+                       />
+                      </Menu>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                   {" "}
                   </form>
                   <RiSendPlaneFill
                     style={{ width: "34px", height: "34px", cursor: "pointer" }}

@@ -8,7 +8,7 @@ import MyAccount from "./pages/profile/myAccount";
 import Chat from "./pages/chat";
 
 const routes=[
-        { path: "/video", name: "Home", element:<RecipeReviewCard/> ,icon:<HiHome/>},
+        { path: "/", name: "Home", element:<RecipeReviewCard/> ,icon:<HiHome/>},
         { path: "/upload", name: "Upload", element:<UploadVideo/> ,icon:<FaCloudUploadAlt/> },
         { path: "/MyAccount", name: "My Account", element:<MyAccount/> ,icon:<BiSolidUserAccount/> },
         { path: "/chat", name: "Chat", element:<Chat/> ,icon:<HiChatBubbleBottomCenterText/> }

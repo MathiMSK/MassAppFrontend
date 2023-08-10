@@ -5,6 +5,7 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { CiCircleRemove } from "react-icons/ci";
 import { GrAddCircle } from "react-icons/gr";
+
 import {
   MDBModal,
   MDBModalDialog,
@@ -59,7 +60,6 @@ export default function GroupChat({
   const [admin, setAdmin] = useState([]);
   const [editUsers, setEditUsers] = useState([]);
   const [groupName, setGroupName] = useState("");
-
   const groupCreate = async () => {
     if (groupName === "") return toast.error("please enter GroupName");
     let res = await groupchatCreate({ groupName, users });
@@ -70,7 +70,6 @@ export default function GroupChat({
     }
     if (!res?.ok) return toast.error(res.data.message);
   };
-
   const adduser = () => {
     let array = [];
     selectuser.map((i) => {
@@ -104,23 +103,32 @@ export default function GroupChat({
   };
 
   const remove = async () => {
-  
-    let userId = [];
+    let userid = [];
+    let adminuser=[]
     add.map((item) => {
       let found = removeId.some((j) => item._id == j._id);
       if (!found && item._id !== id) {
-        userId.push(item._id);
+        userid.push(item._id);
       }
     });
-    if (userId.length !== 0) {
+     userid?.map((i)=>{
+      let found = admin.some((j) => i == j._id);
+      if (found) {
+       adminuser.push(i)
+      }
+     })
+    if (userid.length !== 0) {
       let res = await removeGroupUser(chatId, {
-        userId: userId,
+        userId: userid,
       });
       if (res?.ok) {
         toast.success(res.data.message);
-      }
-     
+      }  
+    } 
+    if(adminuser.length!==0){
+      await Removeadmin(chatId,{userId:adminuser})
     }
+
   };
 
   const adduserdata = async () => {
@@ -167,9 +175,11 @@ export default function GroupChat({
   }, [selectuser]);
 
   const removeAdmin=async(i)=>{ 
+    let itemid=[]
       let ad=admin.filter((item)=>item._id!=i._id)
+      itemid.push(i._id)
       try {
-        await Removeadmin(chatId,{userId:i._id})
+        await Removeadmin(chatId,{userId:itemid})
       } catch (error) {
         console.log(error);
       }
@@ -239,7 +249,6 @@ export default function GroupChat({
                   /> 
                   <div style={{display:"flex",flexWrap:"wrap"}} >
                     {editUsers?.map((i, index) => {
-                      
                       return (
                       <Fragment key={index}>
                         <div  style={{width:"fit-content",margin:"0 10px"}}> 

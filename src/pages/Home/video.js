@@ -36,6 +36,15 @@ export default function RecipeReviewCard() {
   const [open, setOpen] = useState(false); 
   const [profiledata, setProfiledata] = useState("");
   const [zIndex, setZIndex] = useState(0);
+  const [isHover,setHover]=useState(-1)
+
+  const handleOver=(i)=>{
+    setHover(i)
+  }
+  const handleOut=()=>{
+    setHover(-1)
+  }
+  //console.log(isHover);
 
   const [show, setShow] = useState({ like: false, id: 0 }); 
 
@@ -177,8 +186,10 @@ export default function RecipeReviewCard() {
                     }
                     style={{ color: "white", fontFamily: "serif" }}
                   />
-                  <CardMedia style={{ backgroundColor: "black" }}>
+                  <CardMedia  style={{ backgroundColor: "black" }}>
                     <div
+                    onMouseOver={()=>handleOver(i._id)}
+                    onMouseOut={handleOut}
                       style={{
                         alignItems: "center",
                         height: "400px",
@@ -212,9 +223,9 @@ export default function RecipeReviewCard() {
                       </div>
                       <ReactPlayer
                         url={i.videoUrl}
-                        loop={true}
-                        playing={true}
-                        muted={true}
+                        loop={isHover===i._id ?true:false}
+                        playing={isHover===i._id ?true:false}
+                        muted={isHover===i._id ?true:false}
                         style={{ width: "90%", height: "350px" }}
                         controls={true}
                       />
