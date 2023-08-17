@@ -273,8 +273,6 @@ export const editComment = async(id,commentId,body) => {
   return { data: data, ok: true };
 }
 
-
-
 export const Follow = async (id) => {
   let token = localStorage.getItem("token");
   let gettoken=JSON.parse(token)
@@ -397,8 +395,6 @@ export const userGetChat = async () => {
   return { data: data, ok: true };
 };
 /*************************************************************************************** write  CHAT API ********************************************************/
-
-
 export const WriteChat = async (id,body) => {
   let token = localStorage.getItem("token");
   let gettoken=JSON.parse(token)
@@ -595,6 +591,25 @@ export const Removeadmin = async (id,body) => {
     body: JSON.stringify(body),
   };
   const response = await fetch(`${baseUrl}chat/removeadmin/${id}`, requestOptions);
+  if (!response.ok) {
+    let data = await response.json();
+    return { data: data, ok: false };
+  }
+  let data = await response?.json();
+  return { data: data, ok: true };
+}
+export const readby = async (id) => {
+  let token = localStorage.getItem("token");
+  let gettoken=JSON.parse(token)
+  const requestOptions ={
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      token:gettoken
+    }, 
+  };
+  const response = await fetch(`${baseUrl}message/readby/${id}`, requestOptions);
   if (!response.ok) {
     let data = await response.json();
     return { data: data, ok: false };

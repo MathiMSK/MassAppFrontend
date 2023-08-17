@@ -23,8 +23,8 @@ export default function Apps() {
       navigate("/");
     }
   };
-  if (token) {
-    pro();
+  if(token){
+    pro()
   }
   useEffect(() => {
     if (!token) {
@@ -37,7 +37,7 @@ export default function Apps() {
     <>
       <Routes>
         {!token && <Route exact path="/" element={<Layout />}></Route>}
-        {token && <Route exact path="/" element={<Video />}></Route>}xx
+        {token && <Route exact path="/" element={<Video />}></Route>}
         <Route exact path="/MyAccount" element={<MyAccount />}></Route>
         <Route exact path="/upload" element={<UploadVideo />}></Route>
         <Route exact path="/chat" element={<Chat />}></Route>
