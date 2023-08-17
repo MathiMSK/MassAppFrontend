@@ -211,7 +211,7 @@ export default function MyAccount({prosanalid}) {
                   fontFamily: "serif", color: "white",
                   wordBreak: "break-all"
                 }}>
-                  { prosanalid === undefined ? data?.username: prosanalid?.username}</h1>    
+                 Mass Media</h1>    
               </center>
             </Item>
           </Grid>

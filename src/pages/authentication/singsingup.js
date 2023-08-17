@@ -34,7 +34,7 @@ function App() {
     localStorage.setItem("token", JSON.stringify(res?.data?.token));
     let response=await profile()
     console.log(response);
-    nav("/video");
+    nav("/");
   };
   const reg = async () => {
     let res = await userReg({
@@ -48,18 +48,19 @@ function App() {
   };
   return (
     <div style={{ height: "100%" }}>
+     
       <MDBContainer
         fluid
         className="p-4 background-radial-gradient overflow-hidden"
       >
-        <MDBRow>
-          <MDBCol
+        <MDBRow style={{width:"100%",display: "flex",justifyContent: "center",alignItems: "center"}} >
+          {/* <MDBCol
             md="6"
             className="text-center text-md-start d-flex flex-column justify-content-center"
             style={{ top: "-10%" }}
           >
             <h1
-              className="my-5 display-3 fw-bold ls-tight px-3"
+              className="my-1 display-3 fw-bold ls-tight px-3"
               style={{ color: "hsl(218, 81%, 95%)" }}
             >
               <br />
@@ -77,20 +78,11 @@ function App() {
               tempora at cupiditate quis eum maiores libero veritatis? Dicta
               facilis sint aliquid ipsum atque?
             </p>
-          </MDBCol>
-
-          <MDBCol md="6" className="position-relative">
-            <div
-              id="radius-shape-1"
-              className="position-absolute rounded-circle shadow-5-strong"
-            ></div>
-            <div
-              id="radius-shape-2"
-              className="position-absolute shadow-5-strong"
-            ></div>
-
+          </MDBCol> */}
+             
+          <MDBCol style={{ display: "flex",justifyContent: "center",alignItems: "center",height:"100%"}}   >
             {singup ? (
-              <MDBCard className="my-5 bg-glass">
+              <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"0"}}> 
                 <MDBCardBody className="p-5">
                   <center>
                     <h1>Login</h1>
@@ -169,10 +161,10 @@ function App() {
                       <MDBIcon fab icon="github" size="sm" />
                     </MDBBtn>
                   </div>
-                </MDBCardBody>
+                </MDBCardBody>  
               </MDBCard>
             ) : (
-              <MDBCard className="my-5 bg-glass">
+              <MDBCard className="my-5 bg-glass"  style={{width:"450px" ,top:"0"}}>
                 <MDBCardBody className="p-5">
                   <center>
                     <h1>singup</h1>
