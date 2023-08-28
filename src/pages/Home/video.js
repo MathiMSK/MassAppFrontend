@@ -113,7 +113,6 @@ export default function RecipeReviewCard() {
         {allvideo?.map((i, index) => {
           return (
             <Fragment key={index}>
-          {console.log(i)}
               {comment && index === zIndex ? <CommentModal comment={comment} setComment={setComment} i={i} userId={id}  index={index}  zIndex={zIndex} setZIndex={setZIndex} setRefresh={setRefresh}  refresh={refresh} 
               /> :null}
               <center>

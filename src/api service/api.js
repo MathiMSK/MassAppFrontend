@@ -516,6 +516,7 @@ export const getgroupchatId = async (id) => {
   let data = await response?.json();
   return { data: data, ok: true };
 };
+
 export const removeGroupUser = async (id,body) => {
   let token = localStorage.getItem("token");
   let gettoken=JSON.parse(token)
@@ -602,7 +603,7 @@ export const readby = async (id) => {
   let token = localStorage.getItem("token");
   let gettoken=JSON.parse(token)
   const requestOptions ={
-    method: "POST",
+    method: "PUT",
     mode: "cors",
     headers: {
       "Content-Type": "application/json",

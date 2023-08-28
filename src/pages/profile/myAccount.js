@@ -205,11 +205,11 @@ export default function MyAccount({prosanalid}) {
               <center>
                 <h1 className="animate-charcter"  style={{
                  marginTop:" -288px",
-                  zIndex: 1,
-                  position: "absolute",
+                  zIndex: 0,
+                  position: "10px",
                   fontWeight: "bold",
                   fontFamily: "serif", color: "white",
-                  wordBreak: "break-all"
+                  // wordBreak: "break-all"
                 }}>
                  Mass Media</h1>    
               </center>

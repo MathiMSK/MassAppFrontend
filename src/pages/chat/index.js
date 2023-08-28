@@ -3,6 +3,8 @@ import * as React from "react";
 
 import { RiSendPlaneFill } from "react-icons/ri";
 import { BiMessageAdd } from "react-icons/bi";
+import DoneIcon from '@mui/icons-material/Done';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { IoArrowBackCircleSharp } from "react-icons/io5";
 import {
   MDBCard,
@@ -22,7 +24,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -54,6 +56,8 @@ import IconButton1 from "@mui/material/IconButton";
 import moment from "moment/moment";
 import jwt_decode from "jwt-decode";
 import Fab from "@mui/material/Fab";
+import { useContext } from "react";
+import Store from "../../context/context";
 
 let token = localStorage.getItem("token");
 let decoded;
@@ -61,10 +65,10 @@ if (token) {
   decoded = jwt_decode(token);
 }
 
-const ENDPOINT = "ws://localhost:7373/";
-let socket;
+// const ENDPOINT = "ws://localhost:7373/";
+// let socket;
 
-const Chat = () => {
+const Chat = (userDetails) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [data1, setData1] = useState([]);
   const [allData, setAllData] = useState([]);
@@ -75,6 +79,7 @@ const Chat = () => {
   const [chatData, setChatData] = useState("");
   const [sendMessage, setSendMessage] = useState("");
   const [chatId, setchatId] = useState("");
+  const [chatObj, setChatObj] = useState( );
   const [chatpic, setChatpic] = useState("");
   const [send, setSend] = useState([]);
   const [demo, setDemo] = useState([]);
@@ -87,37 +92,50 @@ const Chat = () => {
   const [chatlist, setChatlist] = useState(false);
   const [groupAdmin, setGroupAdmin] = useState([]);
   const [anchorEl1, setAnchorEl1] = useState(null);
-  const [userList, setUserList] = useState([]);
+  const [userList, setUserList] = useState("");
   const [messageForSocket, setMessageForSocket] = useState();
-  const [count, setCount] = useState(0);
+  let found =false
+  const context=useContext(Store) 
   const open1 = Boolean(anchorEl1);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+// console.log(windowWidth >= 500);
+// console.log(windowWidth );
+  useEffect(() => {
+    const handleWindowResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleWindowResize);
+    return () => window.removeEventListener("resize", handleWindowResize);
+  });
+  
   const handleClick1 = (event) => {
     setAnchorEl1(event.currentTarget);
   };
   const handleClose1 = () => {
     setAnchorEl1(null);
   };
+
   const user = async () => {
-    let count=0;
+    let count = 0;
     let data = [];
     let res = await allUser();
     setAllData(res?.data?.users);
     let pro = await profile();
     let reschat = await userGetChat();
     reschat?.data?.map((item) => {
-      item?.messages?.map((k) => { 
-        if(k.sendby._id !== pro?.data?.data?._id){
-          if(k?.readBy?.includes(pro?.data?.data?._id)){ 
-            return
-          } 
-          count++
-          setCount(count)
+      item?.messages?.map((k) => {
+        if (k.sendby._id !== pro?.data?.data?._id) {
+          if (k?.readBy?.includes(pro?.data?.data?._id)) {
+            return;
+          }
+          count++;
         }
       });
+      item.count = count;
+      count = 0;
     });
     let sort = _.sortBy(reschat.data, (i) => {
       return new Date(i?.updatedAt);
     }).reverse();
+    // console.log(sort);
     setDemo(sort);
     res?.data?.users?.map((i) => {
       if (i?._id !== pro?.data?.data._id) {
@@ -142,43 +160,56 @@ const Chat = () => {
     setData1(data);
     setID(pro?.data?.data?._id);
   };
- 
+
   useEffect(() => {
-    console.log("reload");
     user();
   }, [reload]);
 
-  const handle = async (i, j) => { 
-      setChatData(j?.username);
-      setChatpic(j?.profilePicture);
-      setSend(i?.messages);
-      setchatId(i?._id);
-      setChatlist(true);
-      setReload(!reload) 
+  const handle = async (i, j) => {
+    try {
+      let { data } = await readby(i._id);
+      // console.log(data.data);
+    } catch (error) {
+      return console.log(error);
+    }
+    setUserList(j?._id)
+    setChatData(j?.username);
+    setChatpic(j?.profilePicture);
+    setSend(i?.messages);
+    setchatId(i?._id);
+    setChatlist(true);
+    setReload(!reload);
   };
   const grouphandle = async (i) => {
+    // console.log(i);
+    try {
+       await readby(i._id);
+      // console.log(data.data);
+    } catch (error) {
+      return console.log(error);
+    }
     setGroupAdmin(i?.groupAdmin);
     setGroupCreator(i?.groupCreator);
     setChatData(i?.groupName);
     setChatpic(i?.groupDp);
     setSend(i?.messages);
     setchatId(i?._id);
-    setReload(!reload) 
+    setReload(!reload);
     setChatlist(true);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    socket = io(ENDPOINT);
-    socket.emit("setup", decoded);
-    socket.on("connected", () => setSocketConnected(true));
-    socket.emit("addUser", decoded?.id);
-    socket.on("getUser", (user) => {
-      setUserList(user);
-    });
-  }, []);
+  // useEffect(() => {
+  // //   socket = io(ENDPOINT);
+  //   // context.socket.emit("setup", decoded)
+  // //   context.socket.on("connected", () => setSocketConnected(true));
+  //   // context.socket.emit("addUser",decoded?.id);
+  //      context?.socket?.on("getUser", (user) => {
+  //     console.log(user)
+  //   });
+  // },[]);
 
   const chatCreate = async (e) => {
     setSearchinput(e.value);
@@ -195,8 +226,8 @@ const Chat = () => {
     if (found === false) {
       let res = await UserChat({ newUsers: e.id });
       let response = await getchatId(res?.data?.data?._id);
-
       setchatId(res?.data?.data?._id);
+      setChatObj(res.data)
       response?.data?.map((i) => {
         i.users.map((j) => {
           console.log(j, "vfgdskjgf");
@@ -209,9 +240,10 @@ const Chat = () => {
     if (found === true) {
       let response = await getchatId(cid);
       setchatId(cid);
+      setChatObj(response.data)
       response?.data?.map((i) => {
         i.users.map((j) => {
-          console.log(j);
+          // console.log(j);
           setChatData(j?.username);
           setChatpic(j?.profilePicture);
           setSend(i?.messages);
@@ -237,8 +269,8 @@ const Chat = () => {
     if (sendMessage !== "") {
       await WriteChat(chatId, { message: sendMessage });
       const data = await getByIdChat(chatId);
-      console.log("hi", data);
-      socket.emit("new message", data);
+      // console.log("hi", data);
+      context.socket.emit("new message", data);
       setSendMessage("");
       setReload(!reload);
     }
@@ -259,7 +291,8 @@ const Chat = () => {
   useEffect(() => {
     let fetch = async () => {
       let res = await getByIdChat(chatId);
-      socket.emit("join chat", chatId);
+      setChatObj(res.data)
+      context.socket.emit("join chat", chatId);
       setSend(res?.data?.messages);
       setGroup(res?.data?.isGroup);
     };
@@ -268,8 +301,8 @@ const Chat = () => {
 
   useEffect(() => {
     let fetch = async () => {
-      socket?.on("message recieved", (newMessageRecieved) => {
-        console.log("message received");
+      context?.socket?.on("message recieved", (newMessageRecieved) => {
+        // console.log("message received");
         setMessageForSocket(newMessageRecieved);
       });
     };
@@ -283,96 +316,84 @@ const Chat = () => {
         id !== messageForSocket?.lastMessage?.sendby?._id &&
         chatId === messageForSocket?._id
       ) {
-        console.log("message add to list");
+        // console.log("message add to list");
+        let { data } = await readby(messageForSocket._id);
+        console.log(data);
         setSend([...send, messageForSocket?.lastMessage]);
-        setReload(!reload)
+        setReload(!reload);
       } else if (chatId == undefined || messageForSocket?._id !== undefined) {
         let count = 0;
         if (count === 0) {
-          console.log("add new notification");
+          // console.log("add new notification");
           count++;
           setMessageForSocket(null);
-          setReload(!reload)
+          setReload(!reload);
         }
       }
     };
     fetch();
   }, [messageForSocket]);
 
-
+// console.log(context);
   return (
     <>
       <Header />
       <div style={{ marginTop: "30px" }}>
         <MDBRow style={{ width: "100%" }}>
-          {chatlist === false && (
-            <MDBCol md="3" style={{ marginLeft: "10px" }}>
-              <MDBCard style={{ height: "835px" }}>
-                <MDBCardHeader
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  {basicModal && (
-                    <GroupChat
-                      data={data1}
-                      allData={allData}
-                      setBasicModal={setBasicModal}
-                      basicModal={basicModal}
-                      setReload={setReload}
-                      reload={reload}
-                      setRemoveuser={setRemoveuser}
-                      removeuser={removeuser}
-                      action={action}
-                      setAction={setAction}
-                      id={id}
-                      chatId={chatId}
-                    />
-                  )}
-                  <SearchIcon />
-                  <div style={{ width: "100%" }}>
-                    <Select
-                      value={searchinput}
-                      options={data1}
-                      onChange={chatCreate}
-                    />
-                  </div>
-                  <BiMessageAdd
-                    style={{ fontSize: "xx-large", cursor: "pointer" }}
-                    onClick={() => {
-                      setBasicModal(!basicModal);
-                      setAction("new");
-                    }}
+          {/* {chatlist === false && ( */}
+          <MDBCol
+            md="3"
+            style={windowWidth <= 500 ? chatId == "" ?   {marginLeft:"10px"} : { display: "none" } : {marginLeft:"10px"}}
+          >
+            <MDBCard style={{ height: "835px" }}>
+              <MDBCardHeader style={{ display: "flex", alignItems: "center" }}>
+                <SearchIcon />
+                <div style={{ width: "100%" }}>
+                  <Select
+                    value={searchinput}
+                    options={data1}
+                    onChange={chatCreate}
                   />
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <List
-                    style={{
-                      width: "100%",
-                      maxWidth: 570,
-                      bgcolor: "background.paper",
-                      position: "relative",
-                      overflow: "auto",
-                      maxHeight: 740,
-                      "& ul": { padding: 0 },
-                    }}
-                  >
-                    {demo?.map((i, index) =>
-                      !i.isGroup ? (
-                        i?.users?.map((j, index) => {
-                          if (j._id !== id) {
-                            return (
-                              <ul key={index}>
-                                <ListItem
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() => handle(i, j)}
-                                >
-                                  <ListItemAvatar>
-                                    <Avatar src={j?.profilePicture} />
-                                  </ListItemAvatar>
-                                  <ListItemText
-                                    primary={<b>{j?.username}</b>}
-                                    secondary={i?.lastMessage?.message}
-                                  />
-                                 {count !==0 && <Fab
+                </div>
+                <BiMessageAdd
+                  style={{ fontSize: "xx-large", cursor: "pointer" }}
+                  onClick={() => {
+                    setBasicModal(!basicModal);
+                    setAction("new");
+                  }}
+                />
+              </MDBCardHeader>
+              <MDBCardBody>
+                <List
+                  style={{
+                    width: "100%",
+                    maxWidth: 570,
+                    bgcolor: "background.paper",
+                    position: "relative",
+                    overflow: "auto",
+                    maxHeight: 740,
+                    "& ul": { padding: 0 },
+                  }}
+                >
+                  {demo?.map((i, index) =>
+                    !i.isGroup ? (
+                      i?.users?.map((j, index) => {
+                        if (j._id !== id) {
+                          return (
+                            <ul key={index}>
+                              <ListItem
+                                style={{ cursor: "pointer" }}
+                                onClick={() => handle(i, j)}
+                              >
+                                <ListItemAvatar>
+                                  <Avatar src={j?.profilePicture} />
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={<b>{j?.username}</b>}
+                                  secondary={i?.lastMessage?.message}
+                                />
+                                {i.count !== 0 && (
+                                  <Fab
                                     color="secondary"
                                     sx={{
                                       position: "absolute",
@@ -383,51 +404,69 @@ const Chat = () => {
                                       right: (theme) => theme.spacing(1),
                                     }}
                                   >
-                                    {count}
-                                  </Fab>}
-                                </ListItem>
-                                <hr
-                                  style={{
-                                    margin: 0,
-                                    backgroundColor: "white",
-                                  }}
-                                />
-                              </ul>
-                            );
-                          }
-                        })
-                      ) : (
-                        <>
-                          <ListItem
-                            key={index}
-                            style={{ cursor: "pointer" }}
-                            onClick={() => grouphandle(i)}
-                          >
-                            <ListItemAvatar>
-                              <Avatar src={i?.groupDp} />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={<b>{i?.groupName}</b>}
-                              secondary="Jan 9, 2014"
-                            />
-                          </ListItem>
-                          <hr style={{ margin: 0, backgroundColor: "white" }} />
-                        </>
-                      )
-                    )}
-                  </List>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-          )}
+                                    {i.count}
+                                  </Fab>
+                                )}
+                              </ListItem>
+                              <hr
+                                style={{
+                                  margin: 0,
+                                  backgroundColor: "white",
+                                }}
+                              />
+                            </ul>
+                          );
+                        }
+                      })
+                    ) : (
+                      <>
+                        <ListItem
+                          key={index}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => grouphandle(i)}
+                        >
+                          <ListItemAvatar>
+                            <Avatar src={i?.groupDp} />
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={<b>{i?.groupName}</b>}
+                            secondary={i?.lastMessage?.message}
+                          />
+                          {i.count !== 0 && (
+                            <Fab
+                              color="secondary"
+                              sx={{
+                                position: "absolute",
+                                width: "35px",
+                                height: "35px",
+                                top: "10px",
+                                zIndex: "auto",
+                                bottom: (theme) => theme.spacing(1),
+                                right: (theme) => theme.spacing(1),
+                              }}
+                            >
+                              {i.count}
+                            </Fab>
+                          )}
+                        </ListItem>
+                        <hr style={{ margin: 0, backgroundColor: "white" }} />
+                      </>
+                    )
+                  )}
+                </List>
+              </MDBCardBody>
+            </MDBCard>
+          </MDBCol>
+          {/* )} */}
           {chatData && chatpic !== "" ? (
-            <MDBCol>
+            <MDBCol> 
               <MDBCard style={{ height: "840px" }}>
+                
                 <MDBCardHeader>
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <Typography
+                    <div
                       style={{ fontFamily: "serif", fontSize: "larger" }}
                     >
                       <IoArrowBackCircleSharp
@@ -436,23 +475,39 @@ const Chat = () => {
                           setChatData("");
                           setChatpic("");
                           setChatlist(false);
+                          setchatId("");
                         }}
                       />
                       {chatData.toUpperCase()}
-                    </Typography>{" "}
+                      
+                      {
+                      context.usersArr.map((i)=>{
+                          if(i.userId===userList) {
+                            found=true
+                            return <div style={{color:"green"}}>online</div>
+                          }
+                         
+                     })  
+                    }
+                    { found===false &&  <div>offline</div>}
+                    </div>{" "}
                     <Avatar
                       src={chatpic}
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        groupAdmin?.map((i) => {
-                          if (
-                            group === true &&
-                            (groupCreator === id || i?._id === id)
-                          ) {
+                        if (group === true) {
+                          if (groupCreator === id) {
                             setAction("view");
                             setBasicModal(!basicModal);
+                          } else {
+                            groupAdmin?.map((i) => {
+                              if (i?._id === id) {
+                                setAction("view");
+                                setBasicModal(!basicModal);
+                              }
+                            });
                           }
-                        });
+                        }
                       }}
                     />{" "}
                   </div>
@@ -473,6 +528,7 @@ const Chat = () => {
                         {i?.sendby?._id !== id ? (
                           <div key={index}>
                             {" "}
+                          
                             <Box>
                               <div
                                 style={{
@@ -527,8 +583,10 @@ const Chat = () => {
                           </div>
                         ) : (
                           <Box
-                            style={{ display: "flex", justifyContent: "end" }}
+                          style={{ display: "flex", justifyContent: "end" }}
+                          key={index}
                           >
+                           
                             <div
                               style={{
                                 maxWidth: "75%",
@@ -598,6 +656,10 @@ const Chat = () => {
                                 }}
                               >
                                 {moment(i.createdAt).format("LT")}
+                                <div>
+                                  {i.readBy.length<=0 ?  <DoneAllIcon />: <DoneAllIcon style={{color:"#6dace3"}} />}
+  
+                                 </div>
                               </div>
                             </div>
                           </Box>
@@ -680,6 +742,22 @@ const Chat = () => {
             </h1>
           )}
         </MDBRow>
+        {basicModal && (
+          <GroupChat
+            data={data1}
+            allData={allData}
+            setBasicModal={setBasicModal}
+            basicModal={basicModal}
+            setReload={setReload}
+            reload={reload}
+            setRemoveuser={setRemoveuser}
+            removeuser={removeuser}
+            action={action}
+            setAction={setAction}
+            id={id}
+            chatId={chatId}
+          />
+        )}
       </div>
     </>
   );

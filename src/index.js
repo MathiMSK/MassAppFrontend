@@ -4,16 +4,16 @@ import './index.css';
 import Apps from './Apps';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
-// import Store from './context/context';
+import Store from './context/context';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    // <Store.Provider value={{ isfaculty: false,name:"" }}>
+    <Store.Provider value={{usersArr:[],socket:null,userData:{}}}>
     <BrowserRouter>
         <Apps />
         </BrowserRouter>
-    // </Store.Provider>
+     </Store.Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function
