@@ -10,6 +10,7 @@ import UploadVideo from "./header/upload.js";
 import MyAccount from "./pages/profile/myAccount.js";
 import { profile } from "./api service/api";
 import Store from "./context/context";
+import PageNotFound from "./mass";
 
 export default function Apps() {
   const [socketConnected,setSocketConnected]=useState(false)
@@ -60,6 +61,7 @@ export default function Apps() {
         {!token && <Route exact path="/" element={<Layout />}></Route>}
         {token && <Route exact path="/" element={<Video />}></Route>}
         <Route exact path="/MyAccount" element={<MyAccount />}></Route>
+        <Route exact path="*" element={<PageNotFound />}></Route>     
         <Route exact path="/upload" element={<UploadVideo />}></Route>
         <Route exact path="/chat" element={<Chat userDetails={userDetails}  />}></Route>
       </Routes>
