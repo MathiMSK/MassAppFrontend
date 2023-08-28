@@ -12,3 +12,12 @@
 background-color: #636363;
 border-radius: 8px;
 }
+.form{
+    width:"100%"
+}
+
+@media only screen and (min-width:500px){
+    .form{
+        width:"50%"
+    }
+}

@@ -49,8 +49,8 @@ export default function GroupChat({
   reload,
   setReload,
   action,
-  chatId,
-  id
+  id,
+  chatId
 }) {
   const [selectuser, setselectuser] = useState([]);
   const [add, setAdd] = useState([]);
@@ -70,6 +70,7 @@ export default function GroupChat({
     }
     if (!res?.ok) return toast.error(res.data.message);
   };
+console.log(chatId);
   const adduser = () => {
     let array = [];
     selectuser.map((i) => {
@@ -82,6 +83,7 @@ export default function GroupChat({
     let arr = [];
     let filterdata = [];
     let res = await getgroupchatId(chatId);
+    console.log(res)
     res?.data?.map((i) => {
       setAdmin(i?.groupAdmin)
       i?.users?.map((j) => {
