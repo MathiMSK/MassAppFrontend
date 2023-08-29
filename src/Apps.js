@@ -10,7 +10,7 @@ import UploadVideo from "./header/upload.js";
 import MyAccount from "./pages/profile/myAccount.js";
 import { profile } from "./api service/api";
 import Store from "./context/context";
-import PageNotFound from "./mass";
+import PageNotFound from "./pages/PageNotFound";
 
 export default function Apps() {
   const [socketConnected,setSocketConnected]=useState(false)
