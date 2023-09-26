@@ -13,6 +13,7 @@ import Store from "./context/context";
 import PageNotFound from "./pages/PageNotFound";
 import App1 from "./pages/backround/design.js";
 import Back from "./pages/backround/back.js";
+import Auth from "./pages/authentication";
 
 export default function Apps() {
   const [socketConnected,setSocketConnected]=useState(false)
@@ -60,7 +61,8 @@ export default function Apps() {
   return (
     <>
       <Routes>
-        {!token && <Route exact path="/" element={<Layout />}></Route>}
+        {!token && <Route exact path="/" element={<Auth />}></Route>}
+        {/* {!token && <Route exact path="/" element={<Layout />}></Route>} */}
         {token && <Route exact path="/" element={<Video />}></Route>}
         <Route exact path="/MyAccount" element={<MyAccount />}></Route>
         <Route exact path="*" element={<PageNotFound />}></Route>     
