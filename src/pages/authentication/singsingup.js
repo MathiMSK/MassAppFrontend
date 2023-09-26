@@ -88,7 +88,7 @@ function App() {
         
           <MDBCol style={{ display: "flex",justifyContent: "center",alignItems: "center",height:"100%"}}  >
             {signup ? (
-              <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"0"}}> 
+              <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"421px"}}> 
                 <MDBCardBody className="p-5">
                   <center>
                     <h1 style={{color:"white"}}>Login</h1>
