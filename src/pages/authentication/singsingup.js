@@ -14,44 +14,57 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
 import "./login.css";
-import { Button, TextField, Typography,Input } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { profile, userLogin, userReg } from "../../api service/api";
 import { toast } from "react-toastify";
-import Back from "../backround/back";
 
 function App() {
-  const [singup, setSingup] = useState(true);
-  const [singupName, setSingupName] = useState("");
-  const [singupEmail, setSingupEmail] = useState("");
-  const [singupPassword, setSingupPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const [signup, setSignup] = useState(true);
+
   const nav = useNavigate();
 
+  //Login
+  const [loginValues, setLoginValues] = useState({
+    email: "",
+    password: "",
+  });
+  const loginHandler = (e) => {
+    setLoginValues({ ...loginValues, [e.target.name]: e.target.value})
+ }
+
   const handel = async () => {
-    let res = await userLogin({ email, password });
+    let res = await userLogin({ email: loginValues.email, password: loginValues.password });
     if (!res.ok) return toast.error(res?.message);
     localStorage.setItem("token", JSON.stringify(res?.data?.token));
-    let response=await profile()
+    let response=await profile();
     console.log(response);
     nav("/");
   };
+
+  //Register
+  const [signupValues, setSignupValues] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const registerHandler = (e) => {
+    setSignupValues({ ...signupValues, [e.target.name]: e.target.value });
+  };
+
   const reg = async () => {
     let res = await userReg({
-      username: singupName,
-      email: singupEmail,
-      password: singupPassword,
+      username: signupValues.username,
+      email: signupValues.email,
+      password: signupValues.password,
     });
     if (!res.ok) return toast.error(!res.message);
-    
-    setSingup(!singup);
+    setSignup(!signup);
   };
+  
   return (
-    <div style={{ height: "100%" , position:"relative"}}>
-      <div  style={{}} >
-        <Back  />  
-      </div>
+    <div style={{ height: "100%" }}>
       <MDBContainer
         style={{position:"absolute",top:0}}
         fluid
@@ -61,7 +74,7 @@ function App() {
         <MDBRow style={{width:"100%",display: "flex",justifyContent: "center",alignItems: "center"}} >
         
           <MDBCol style={{ display: "flex",justifyContent: "center",alignItems: "center",height:"100%"}}  >
-            {singup ? (
+            {signup ? (
               <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"0"}}> 
                 <MDBCardBody className="p-5">
                   <center>
@@ -71,36 +84,28 @@ function App() {
                   <center>
                     <TextField
                       id="standard-password-input"
+                      name="email"
                       label="Email"
                       variant="outlined"
                       style={{
                         width: "101%",
                         marginBottom: "37px",
                       }}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={loginHandler}
                     />
-                    <br />
-                    <br />
                     <TextField
                       id="standard-password-input"
+                      name="password"
                       label="PassWord"
                       variant="outlined"
                       style={{
                         width: "101%",
                         marginBottom: "37px",
                       }}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={loginHandler}
                     />
-                    <br />
-                    <br />
-                    {/* <Button variant="contained" onClick={handel}>
-                      Login
-                    </Button>
-                    <br />
-                    <br />
-                    <Link onClick={() => setSingup(!singup)}>Create Account</Link> */}
                     <div style={{display:"flex",justifyContent:"space-between"}}>
-                    <Link onClick={() => setSingup(!singup)}><Typography style={{color:"white"}} >Create Account</Typography></Link>
+                   <div  style={{filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))" ,marginTop:"8px"}}><Link onClick={() => setSignup(!signup)}><Typography style={{color:"whitesmoke",filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))" }} >Create Account</Typography></Link></div> 
                      <Button variant="contained" onClick={handel}>
                       Login
                     </Button>
@@ -151,36 +156,48 @@ function App() {
               <MDBCard className="my-5 bg-glass"  style={{width:"450px" ,top:"0"}}>
                 <MDBCardBody className="p-5">
                   <center>
-                    <h1>singup</h1>
+                    <h1>Create Account</h1>
                   </center>
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Name"
-                    id="form3"
-                    type="name"
-                    onChange={(e) => setSingupName(e.target.value)}
-                  />
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Email"
-                    id="form3"
-                    type="email"
-                    onChange={(e) => setSingupEmail(e.target.value)}
-                  />
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Password"
-                    id="form4"
-                    type="password"
-                    onChange={(e) => setSingupPassword(e.target.value)}
-                  />
+                  <TextField
+                      id="standard-password-input"
+                      name="username"
+                      label="Name"
+                      variant="outlined"
+                      style={{
+                        width: "101%",
+                        marginBottom: "37px",
+                      }}
+                      onChange={registerHandler}
+                    />
+                <TextField
+                      id="standard-password-input"
+                      name="email"
+                      label="Email"
+                      variant="outlined"
+                      style={{
+                        width: "101%",
+                        marginBottom: "37px",
+                      }}
+                      onChange={registerHandler}
+                    />
+                 <TextField
+                      id="standard-password-input"
+                      name="password"
+                      label="PassWord"
+                      variant="outlined"
+                      style={{
+                        width: "101%",
+                        marginBottom: "37px",
+                      }}
+                      onChange={registerHandler}
+                    />
                   <center>
+                  <div style={{display:"flex",justifyContent:"space-between"}}>
+                  <div  style={{filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))",marginTop:"8px"}}> <Link onClick={() => setSignup(!signup)}><Typography style={{color:"whitesmoke",filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))"}}>Login</Typography></Link></div>
                     <Button variant="contained" onClick={reg}>
-                      singup
+                      sign up
                     </Button>
-                    <br />
-                    <br />
-                    <Link onClick={() => setSingup(!singup)}>Login</Link>
+                </div>
                   </center>
                   <br />
                   <br />
