@@ -18,7 +18,6 @@ import { Button, TextField, Typography,Input } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { profile, userLogin, userReg } from "../../api service/api";
 import { toast } from "react-toastify";
-import Back from "../backround/back";
 
 function App() {
   const [singup, setSingup] = useState(true);
@@ -48,12 +47,13 @@ function App() {
     setSingup(!singup);
   };
   return (
-    <div style={{ height: "100%" , position:"relative"}}>
-      <div  style={{}} >
+    // <div style={{ height: "100%" , position:"relative"}}>
+    <div style={{ height: "100%"}}>
+      {/* <div >
         <Back  />  
-      </div>
+      </div> */}
       <MDBContainer
-        style={{position:"absolute",top:0}}
+        style={{position:"absolute" ,top:0}}
         fluid
         className="p-4 background-radial-gradient "
       
@@ -65,7 +65,7 @@ function App() {
               <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"0"}}> 
                 <MDBCardBody className="p-5">
                   <center>
-                    <h1>Login</h1>
+                    <h1 style={{color:"white"}}>Login</h1>
                   </center>
                   <br />
                   <center>
@@ -73,11 +73,14 @@ function App() {
                       id="standard-password-input"
                       label="Email"
                       variant="outlined"
+                      InputProps={{ inputProps: { style: { color: 'white' }}}}
                       style={{
                         width: "101%",
                         marginBottom: "37px",
                       }}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) =>{
+                        e.preventDefault()
+                         setEmail(e.target.value)}}
                     />
                     <br />
                     <br />
@@ -151,7 +154,7 @@ function App() {
               <MDBCard className="my-5 bg-glass"  style={{width:"450px" ,top:"0"}}>
                 <MDBCardBody className="p-5">
                   <center>
-                    <h1>singup</h1>
+                    <h1 style={{color:"white"}}>singup</h1>
                   </center>
                   <MDBInput
                     wrapperClass="mb-4"
