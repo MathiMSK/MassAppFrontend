@@ -19,12 +19,13 @@
   animation: textclip 2s linear infinite;
   display: inline-block;
     font-size:100px;
-      margin-left:-300px;
+    margin-left:-150px;
+   
 }
 
 @keyframes textclip {
   to {
-    background-position: 200% center;
+    background-position: 300% center;
   }
 }
 

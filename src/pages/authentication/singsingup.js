@@ -14,10 +14,11 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
 import "./login.css";
-import { Button, TextField } from "@mui/material";
+import { Button, TextField, Typography,Input } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { profile, userLogin, userReg } from "../../api service/api";
 import { toast } from "react-toastify";
+import Back from "../backround/back";
 
 function App() {
   const [singup, setSingup] = useState(true);
@@ -47,40 +48,19 @@ function App() {
     setSingup(!singup);
   };
   return (
-    <div style={{ height: "100%" }}>
-     
+    <div style={{ height: "100%" , position:"relative"}}>
+      <div  style={{}} >
+        <Back  />  
+      </div>
       <MDBContainer
+        style={{position:"absolute",top:0}}
         fluid
-        className="p-4 background-radial-gradient overflow-hidden"
+        className="p-4 background-radial-gradient "
+      
       >
         <MDBRow style={{width:"100%",display: "flex",justifyContent: "center",alignItems: "center"}} >
-          {/* <MDBCol
-            md="6"
-            className="text-center text-md-start d-flex flex-column justify-content-center"
-            style={{ top: "-10%" }}
-          >
-            <h1
-              className="my-1 display-3 fw-bold ls-tight px-3"
-              style={{ color: "hsl(218, 81%, 95%)" }}
-            >
-              <br />
-              <span
-                style={{ color: "hsl(218, 81%, 75%)", fontFamily: "serif" }}
-              >
-                {" "}
-                Mass Media
-              </span>
-            </h1>
-
-            <p className="px-3" style={{ color: "hsl(218, 81%, 85%)" }}>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet,
-              itaque accusantium odio, soluta, corrupti aliquam quibusdam
-              tempora at cupiditate quis eum maiores libero veritatis? Dicta
-              facilis sint aliquid ipsum atque?
-            </p>
-          </MDBCol> */}
-             
-          <MDBCol style={{ display: "flex",justifyContent: "center",alignItems: "center",height:"100%"}}   >
+        
+          <MDBCol style={{ display: "flex",justifyContent: "center",alignItems: "center",height:"100%"}}  >
             {singup ? (
               <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"0"}}> 
                 <MDBCardBody className="p-5">
@@ -90,12 +70,11 @@ function App() {
                   <br />
                   <center>
                     <TextField
-                      id="outlined-basic"
+                      id="standard-password-input"
                       label="Email"
                       variant="outlined"
                       style={{
                         width: "101%",
-                        backgroundColor: "white",
                         marginBottom: "37px",
                       }}
                       onChange={(e) => setEmail(e.target.value)}
@@ -103,24 +82,29 @@ function App() {
                     <br />
                     <br />
                     <TextField
-                      id="outlined-basic"
+                      id="standard-password-input"
                       label="PassWord"
                       variant="outlined"
                       style={{
                         width: "101%",
-                        backgroundColor: "white",
                         marginBottom: "37px",
                       }}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                     <br />
                     <br />
-                    <Button variant="contained" onClick={handel}>
+                    {/* <Button variant="contained" onClick={handel}>
                       Login
                     </Button>
                     <br />
                     <br />
-                    <Link onClick={() => setSingup(!singup)}>singup</Link>
+                    <Link onClick={() => setSingup(!singup)}>Create Account</Link> */}
+                    <div style={{display:"flex",justifyContent:"space-between"}}>
+                    <Link onClick={() => setSingup(!singup)}><Typography style={{color:"white"}} >Create Account</Typography></Link>
+                     <Button variant="contained" onClick={handel}>
+                      Login
+                    </Button>
+                    </div>
                   </center>
                   <br />
                   <br />

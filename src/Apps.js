@@ -11,6 +11,8 @@ import MyAccount from "./pages/profile/myAccount.js";
 import { profile } from "./api service/api";
 import Store from "./context/context";
 import PageNotFound from "./pages/PageNotFound";
+import App1 from "./pages/backround/design.js";
+import Back from "./pages/backround/back.js";
 
 export default function Apps() {
   const [socketConnected,setSocketConnected]=useState(false)
@@ -64,6 +66,8 @@ export default function Apps() {
         <Route exact path="*" element={<PageNotFound />}></Route>     
         <Route exact path="/upload" element={<UploadVideo />}></Route>
         <Route exact path="/chat" element={<Chat userDetails={userDetails}  />}></Route>
+        <Route exact path="/c" element={<App1 />}></Route>
+        <Route exact path="/ch" element={<Back />}></Route>
       </Routes>
       <ToastContainer />
     </>

@@ -58,6 +58,7 @@ import jwt_decode from "jwt-decode";
 import Fab from "@mui/material/Fab";
 import { useContext } from "react";
 import Store from "../../context/context";
+import ShowMoreText from "react-show-more-text";
 
 let token = localStorage.getItem("token");
 let decoded;
@@ -334,7 +335,6 @@ const Chat = (userDetails) => {
     fetch();
   }, [messageForSocket]);
 
-// console.log(context);
   return (
     <>
       <Header />
@@ -390,7 +390,22 @@ const Chat = (userDetails) => {
                                 </ListItemAvatar>
                                 <ListItemText
                                   primary={<b>{j?.username}</b>}
-                                  secondary={i?.lastMessage?.message}
+                                  secondary={ <ShowMoreText
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                    }}
+                                    lines={1}
+                                    more="Show More"
+                                    less="Show Less"
+                                    className="content-css"
+                                    anchorClass="show-more-less-clickable"
+                                    expanded={false}
+                                    width={259}
+                                    truncatedEndingComponent={"... "}
+                                  >
+                                    <Typography>{i?.lastMessage?.message}</Typography>
+                                  </ShowMoreText>}
                                 />
                                 {i.count !== 0 && (
                                   <Fab
@@ -430,7 +445,22 @@ const Chat = (userDetails) => {
                           </ListItemAvatar>
                           <ListItemText
                             primary={<b>{i?.groupName}</b>}
-                            secondary={i?.lastMessage?.message}
+                            secondary={ <ShowMoreText
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                              }}
+                              lines={1}
+                              more="Show More"
+                              less="Show Less"
+                              className="content-css"
+                              anchorClass="show-more-less-clickable"
+                              expanded={false}
+                              width={259}
+                              truncatedEndingComponent={"..."}
+                            >
+                              <Typography>{i?.lastMessage?.message}</Typography>
+                            </ShowMoreText>}
                           />
                           {i.count !== 0 && (
                             <Fab
