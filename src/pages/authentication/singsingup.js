@@ -7,7 +7,6 @@ import {
   MDBCol,
   MDBCard,
   MDBCardBody,
-  MDBInput,
   MDBIcon,
 } from "mdb-react-ui-kit";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -18,8 +17,20 @@ import { Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { profile, userLogin, userReg } from "../../api service/api";
 import { toast } from "react-toastify";
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  root: {},
+  focused: {},
+  notchedOutline: {
+    borderWidth: "1px",
+    borderColor: "white !important",
+    color:"white",
+  }
+}));
 
 function App() {
+  const classes = useStyles();
 
   const [signup, setSignup] = useState(true);
 
@@ -62,6 +73,8 @@ function App() {
     if (!res.ok) return toast.error(!res.message);
     setSignup(!signup);
   };
+
+ 
   
   return (
     <div style={{ height: "100%" }}>
@@ -78,7 +91,7 @@ function App() {
               <MDBCard className="my-5 bg-glass" style={{width:"450px" ,top:"0"}}> 
                 <MDBCardBody className="p-5">
                   <center>
-                    <h1>Login</h1>
+                    <h1 style={{color:"white"}}>Login</h1>
                   </center>
                   <br />
                   <center>
@@ -87,25 +100,64 @@ function App() {
                       name="email"
                       label="Email"
                       variant="outlined"
+                      InputProps={{
+                        classes: {
+                          root: classes.root,
+                          focused: classes.focused,
+                          notchedOutline: classes.notchedOutline
+                        }
+                          }}
                       style={{
                         width: "101%",
                         marginBottom: "37px",
                       }}
+                      sx={{
+                        "& .MuiInputLabel-root": {color: 'white'},//styles the label
+                        "& .MuiOutlinedInput-root": {
+                          "& > fieldset": { borderColor: "white", fontcolor:"white" },
+                        },
+                        "& .MuiFormLabel-root": {
+                          "&.Mui-focused": { color: "white" },
+                        },
+                        "& .MuiOutlinedInput-input": {
+                          color: "white",
+                        },
+                      }}
                       onChange={loginHandler}
                     />
-                    <TextField
+                   <TextField
                       id="standard-password-input"
                       name="password"
                       label="PassWord"
                       variant="outlined"
+                      // fontcolor="white"
+                      InputProps={{
+                        classes: {
+                          root: classes.root,
+                          focused: classes.focused,
+                          notchedOutline: classes.notchedOutline
+                        }
+                          }}
                       style={{
                         width: "101%",
                         marginBottom: "37px",
                       }}
+                      sx={{
+                        "& .MuiInputLabel-root": {color: 'white'},//styles the label
+                        "& .MuiOutlinedInput-root": {
+                          "& > fieldset": { borderColor: "white", fontcolor:"white" },
+                        },
+                        "& .MuiFormLabel-root": {
+                          "&.Mui-focused": { color: "white" },
+                        },
+                        "& .MuiOutlinedInput-input": {
+                          color: "white",
+                        },
+                      }}
                       onChange={loginHandler}
                     />
                     <div style={{display:"flex",justifyContent:"space-between"}}>
-                   <div  style={{filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))" ,marginTop:"8px"}}><Link onClick={() => setSignup(!signup)}><Typography style={{color:"whitesmoke",filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))" }} >Create Account</Typography></Link></div> 
+                   <div  style={{filter: "drop-shadow(5px 5px 5px rgba(255, 255, 255))" ,marginTop:"8px"}}><Link onClick={() => setSignup(!signup)}><Typography style={{color:"whitesmoke",filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))" }} >Create Account</Typography></Link></div> 
                      <Button variant="contained" onClick={handel}>
                       Login
                     </Button>
@@ -193,7 +245,7 @@ function App() {
                     />
                   <center>
                   <div style={{display:"flex",justifyContent:"space-between"}}>
-                  <div  style={{filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))",marginTop:"8px"}}> <Link onClick={() => setSignup(!signup)}><Typography style={{color:"whitesmoke",filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))"}}>Login</Typography></Link></div>
+                  <div  style={{filter: "drop-shadow(5px 5px 5px rgba(255, 255, 255))",marginTop:"8px"}}> <Link onClick={() => setSignup(!signup)}><Typography style={{color:"whitesmoke",filter: "drop-shadow(5px 5px 5px rgba(0,0,0,0.3))"}}>Login</Typography></Link></div>
                     <Button variant="contained" onClick={reg}>
                       sign up
                     </Button>
