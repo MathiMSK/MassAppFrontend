@@ -85,7 +85,7 @@ const UploadVideo = () => {
           if (data.url) {
             await axios({
               method: "post",
-              url: "http://localhost:7373/api/video/create",
+              url: "https://chatappranjith-1.onrender.com/api/video/create",
               data: {
                 title,
                 description,

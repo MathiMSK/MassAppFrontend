@@ -1,4 +1,5 @@
-let baseUrl = "http://localhost:7373/api/";
+let baseUrl = "https://chatappranjith-1.onrender.com/api/";
+// let baseUrl = "http://localhost:7373/api/";
 /***************************************************************************************USER API ********************************************************/
 export const userLogin = async (body) => {
   const requestOptions = {

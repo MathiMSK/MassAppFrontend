@@ -19,7 +19,7 @@ export default function Apps() {
   const [socketConnected,setSocketConnected]=useState(false)
   const [userDetails,setUserDetails]=useState([])
   const context=useContext(Store) 
-  const ENDPOINT = "ws://localhost:7373/";
+  const ENDPOINT = "wss://https://chatappranjith-1.onrender.com/";
   let socket;
   let navigate = useNavigate();
   let getToken = localStorage.getItem("token");
