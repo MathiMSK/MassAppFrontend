@@ -66,6 +66,9 @@
       "react-app/jest"
     ]
   },
+  "resolutions": {
+     "react-toastify": "9.1.3"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
